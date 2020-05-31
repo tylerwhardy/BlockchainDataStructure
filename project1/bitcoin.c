@@ -3,55 +3,73 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
+#include <string.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
 #include <openssl/ssl.h>
 #include <openssl/obj_mac.h>
 #include <openssl/ec.h>
 
-struct user{
+struct users{
   int user_id;
-  char address[100];
+  char private[100];
+  char public[100];
   int satoshis;
 };
 
-struct user NewUser();
+struct block{
+  uint32_t version;
+  char previousblockhash[32];
+  char markleroothash[32];
+  uint32_t time;
+  uint32_t nBits;
+  uint32_t nonce; 
+  unsigned char magic_number;
+  uint32_t blocksize;
+  int transactionCounter; 
+};
 
-struct user display();
+struct users NewUser(int uid);
+void CreateGenesis();
+void display(struct users s);
+void AddBlock(struct block lastBlock);
+
 
 int main(){
   printf("Initializing project...\n");
   printf("Creating users...\n");
-  int intUserTotal = 0;
   int intInitialCoin = 0;
-  struct users[6]; 
-  do{
+  struct users user[6]; 
+  for ( int intUserTotal = 0; intUserTotal < 7; intUserTotal++){
     printf("Creating User: %d\n",intUserTotal);
-    intUserTotal++;
-    users[intUserTotal] = NewUser(intUserTotal);//NewUser
-    display(users[intUserTotal]);
-   } while(intUserTotal < 7);
-  printf("Users created\n");
-  printf("Enter initial coin count: ");
+    user[intUserTotal] = NewUser(intUserTotal);
+    display(user[intUserTotal]);
+  }
+  printf("\nAll users created\n\n");
+  printf("Enter initial Satoshi count: ");
   scanf("%d", &intInitialCoin);
   printf("Distributing %d coins to User 0\n", intInitialCoin);
   return 0;
 }
 
-user NewUser(int uid){
-// Function NewUser
+struct users NewUser(int uid){
 // Defines a new user
-  user_id = uid;
-  address = "abcd";
-  satoshis = 0;
-  return user);
+  struct users user;
+  user.user_id = uid;
+  strcpy(user.public, "abcd");
+  strcpy(user.private,"efgh");
+  user.satoshis = 0;
+  return user;
 }
 
-void display(struct user s){
+void display(struct users s){
+  // Displays information about a user
   printf("\nDisplaying information on user\n");
-  printf("UserID: %s\n", user.name);
-  printf("Address:\n"); // Insert address here
-  printf("Balance:\n"); // Insert balance here
+  printf("UserID:%d\n", s.user_id);
+  printf("Public Key:%s\n", s.public);
+  printf("Private Key:%s\n", s.private);
+  printf("Balance:%d\n\n", s.satoshis);
 }
 
 // Function CreateTransaction
@@ -60,8 +78,12 @@ void display(struct user s){
 // Function CreateTree
 // Creates a Merkle tree for a transaction
 
-// Function CreateGenesis
-// Creates a Genesis block
+void CreateGenesis(){
+  // Creates a Genesis block
+  int PreviousTransaction = 0;
+  //void AddBlock(PreviousTransaction)
+}
 
-// Function AddBlock
-// Adds a block to the Genesis block
+void AddBlock(struct block lastBlock){
+  // Adds a block to the Genesis block
+}
