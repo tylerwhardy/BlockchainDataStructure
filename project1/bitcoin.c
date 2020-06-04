@@ -10,6 +10,8 @@
 #include <openssl/ssl.h>
 #include <openssl/obj_mac.h>
 #include <openssl/ec.h>
+#include "itoa.h"
+
 
 struct users{
   int user_id;
@@ -55,10 +57,25 @@ int main(){
 
 struct users NewUser(int uid){
 // Defines a new user
+  char suid[2];
+  char src[20];
+  char username[20];
   struct users user;
-  user.user_id = uid;
-  strcpy(user.public, "abcd");
-  strcpy(user.private,"efgh");
+  char publicpath[20];
+  char privatepath[20];
+  char private[20] = "private.pem";
+  char public[20] = "public.pem";
+  
+    user.user_id = uid;
+  itoa(uid, suid,10);
+
+  strcpy(username,"user");
+  strncat(username,suid,10);
+
+  strcpy(user.public, username);
+  strcpy(user.private, username);
+  strncat(user.public, public,10);
+  strncat(user.private, private,11);
   user.satoshis = 0;
   return user;
 }
@@ -87,3 +104,19 @@ void CreateGenesis(){
 void AddBlock(struct block lastBlock){
   // Adds a block to the Genesis block
 }
+
+// For Reference Only ********
+// These are CLI commands to generate the associated keys
+// This application assumes a prefix of usern where n is the user number
+// For example, user1public.pem
+
+// Create Eliptic Curve parameter file:
+// openssl ecparam -name secp256k1 -out secp256k1.pem
+
+// Create Private key
+// openssl ecparam -in secp256k1.pem -genkey -noout -out private.pem
+
+// Create Public key from Private
+// openssl ec -in private.pem -pubout -out public.pem
+
+// ******************************
