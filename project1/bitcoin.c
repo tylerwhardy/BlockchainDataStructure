@@ -23,7 +23,7 @@ struct users{
 struct block{
   uint32_t version;
   char previousblockhash[32];
-  char markleroothash[32];
+  char merkleroothash[32];
   uint32_t time;
   uint32_t nBits;
   uint32_t nonce; 
@@ -37,8 +37,11 @@ void CreateGenesis();
 void display(struct users s);
 void AddBlock(struct block lastBlock);
 
-
 int main(){
+  char charDecision;
+  int intSender;
+  int intReceiver;
+  int intAmount;
   printf("Initializing project...\n");
   printf("Creating users...\n");
   int intInitialCoin = 0;
@@ -52,6 +55,32 @@ int main(){
   printf("Enter initial Satoshi count: ");
   scanf("%d", &intInitialCoin);
   printf("Distributing %d coins to User 0\n", intInitialCoin);
+  user[0].satoshis = intInitialCoin;
+  // CreateGenesis();
+  do{ 
+    printf("Which user wants to send coins?\n");
+    scanf("%d", &intSender);
+    printf("Which user is receiving coins?\n");
+    scanf("%d", &intReceiver);
+    printf("How many coins are we sending (in Satoshis)?");
+    scanf("%d", &intAmount);
+
+    user[intSender].satoshis = user[intSender].satoshis - intAmount;
+    user[intReceiver].satoshis = user[intReceiver].satoshis + intAmount;
+
+    printf("\nSender:\n");
+    display(user[intSender]);
+    printf("\nReceiver:\n");
+    display(user[intReceiver]);
+    printf("\n");
+
+    
+    printf("Do you want to make another transaction? (y/n)\n");
+    scanf(" %c",&charDecision);
+
+
+  } while (charDecision ==  'y');
+  
   return 0;
 }
 
@@ -66,7 +95,7 @@ struct users NewUser(int uid){
   char private[20] = "private.pem";
   char public[20] = "public.pem";
   
-    user.user_id = uid;
+  user.user_id = uid;
   itoa(uid, suid,10);
 
   strcpy(username,"user");
@@ -87,6 +116,7 @@ void display(struct users s){
   printf("Public Key:%s\n", s.public);
   printf("Private Key:%s\n", s.private);
   printf("Balance:%d\n\n", s.satoshis);
+  CreateGenesis();
 }
 
 // Function CreateTransaction
@@ -98,12 +128,18 @@ void display(struct users s){
 void CreateGenesis(){
   // Creates a Genesis block
   int PreviousTransaction = 0;
+  int time;
+  time = system("date '+%s'");
+  printf("%d", time);
   //void AddBlock(PreviousTransaction)
 }
 
 void AddBlock(struct block lastBlock){
   // Adds a block to the Genesis block
+  FILE *fileChain = fopen("chain","w");
+  fprintf(fileChain, "Block");
 }
+
 
 // For Reference Only ********
 // These are CLI commands to generate the associated keys
@@ -118,5 +154,11 @@ void AddBlock(struct block lastBlock){
 
 // Create Public key from Private
 // openssl ec -in private.pem -pubout -out public.pem
+
+// Sign a file
+// system("openssl dgst -sign user1private.pem test.pdf > signature.bin")
+
+// Verify a file
+// system("openssl dgst -verify user1public.pem -signature signature.bin test.pdf")
 
 // ******************************
