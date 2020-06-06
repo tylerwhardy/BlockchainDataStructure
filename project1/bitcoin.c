@@ -20,17 +20,30 @@ struct users{
   int satoshis;
 };
 
+struct transaction{
+  // This is to represent a transaction. Some features are abstracted away. 
+  int input; // sender balance
+  int output; // receiver balance
+  int output2; // sender balance
+  uint32_t time; // timestamp 
+};
+
 struct block{
+  // Header
   uint32_t version;
   char previousblockhash[32];
   char merkleroothash[32];
   uint32_t time;
-  uint32_t nBits;
-  uint32_t nonce; 
+  uint32_t nBits; // This is something for mining, we will leave it at 0
+  uint32_t nonce; // This is something for mining, we will leave it at 0
+  // /Header
   unsigned char magic_number;
   uint32_t blocksize;
-  int transactionCounter; 
+  int transactionCounter;
+  struct transaction transactionList;
 };
+
+
 
 struct users NewUser(int uid);
 void CreateGenesis();
@@ -38,11 +51,13 @@ void display(struct users s);
 void AddBlock(struct block lastBlock);
 
 int main(){
+  printf("Initializing project...\n");
   char charDecision;
   int intSender;
   int intReceiver;
   int intAmount;
-  printf("Initializing project...\n");
+  int intTransactionCounter;
+  struct transaction structTransaction[100]; // Limited to 99 transactions
   printf("Creating users...\n");
   int intInitialCoin = 0;
   struct users user[6]; 
@@ -56,8 +71,12 @@ int main(){
   scanf("%d", &intInitialCoin);
   printf("Distributing %d coins to User 0\n", intInitialCoin);
   user[0].satoshis = intInitialCoin;
+
+  
+  
   // CreateGenesis();
-  do{ 
+  do{
+    intTransactionCounter++;
     printf("Which user wants to send coins?\n");
     scanf("%d", &intSender);
     printf("Which user is receiving coins?\n");
@@ -65,8 +84,14 @@ int main(){
     printf("How many coins are we sending (in Satoshis)?");
     scanf("%d", &intAmount);
 
+    structTransaction[intTransactionCounter].input = user[intSender].satoshis;
+
     user[intSender].satoshis = user[intSender].satoshis - intAmount;
     user[intReceiver].satoshis = user[intReceiver].satoshis + intAmount;
+
+    structTransaction[intTransactionCounter].output = user[intReceiver].satoshis;
+    structTransaction[intTransactionCounter].input = user[intSender].satoshis;
+    structTransaction[intTransactionCounter].time = system("date '+%s'");
 
     printf("\nSender:\n");
     display(user[intSender]);
@@ -79,7 +104,7 @@ int main(){
     scanf(" %c",&charDecision);
 
 
-  } while (charDecision ==  'y');
+  } while (charDecision ==  'y' && intTransactionCounter < 100);
   
   return 0;
 }
