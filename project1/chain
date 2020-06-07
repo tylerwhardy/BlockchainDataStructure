@@ -1,0 +1,48 @@
+
+New Block ***************************
+Version 1
+Last Block Hash: 
+Merkle Root Hash: 
+Block Time: 0
+nBits: 0
+Nonce: 0
+Magic Number: 0
+Blocksize: 0
+Block Transaction Counter: 0
+Transaction Input: 0
+Transaction Sending: 25
+Transaction Remaining With Sender: -25
+Transaction Time: 0
+*************************************
+
+New Block ***************************
+Version 1
+Last Block Hash: 
+Merkle Root Hash: 
+Block Time: 0
+nBits: 0
+Nonce: 0
+Magic Number: 0
+Blocksize: 0
+Block Transaction Counter: 0
+Transaction Input: 500
+Transaction Sending: 50
+Transaction Remaining With Sender: 450
+Transaction Time: 0
+*************************************
+
+New Block ***************************
+Version 1
+Last Block Hash: 
+Merkle Root Hash: 
+Block Time: 0
+nBits: 0
+Nonce: 0
+Magic Number: 0
+Blocksize: 0
+Block Transaction Counter: 0
+Transaction Input: 500
+Transaction Sending: 0
+Transaction Remaining With Sender: 500
+Transaction Time: 0
+*************************************

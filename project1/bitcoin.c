@@ -23,8 +23,8 @@ struct users{
 struct transaction{
   // This is to represent a transaction. Some features are abstracted away. 
   int input; // sender balance
-  int output; // receiver balance
-  int output2; // sender balance
+  int output; // sending to receiver
+  int output2; // remaining with sender
   uint32_t time; // timestamp 
 };
 
@@ -48,7 +48,7 @@ struct block{
 struct users NewUser(int uid);
 void CreateGenesis();
 void display(struct users s);
-void AddBlock(struct block lastBlock);
+struct block AddBlock(struct block lastBlock, struct transaction structTransaction);
 
 int main(){
   printf("Initializing project...\n");
@@ -56,8 +56,27 @@ int main(){
   int intSender;
   int intReceiver;
   int intAmount;
-  int intTransactionCounter;
+  int intTransactionCounter = 0;
   struct transaction structTransaction[100]; // Limited to 99 transactions
+  printf("Clearing old blockchain files...\n");
+  system("rm chain");
+  printf("Aged blockchains cleared!\n");
+  // Defining the Genesis Block
+  struct block NullBlock;
+  struct block LastBlock; // Return from adding a block
+  struct block NewBlock; // PlaceHolder until we recycle transactions
+  NullBlock.version = 1;
+  NullBlock.previousblockhash[0] = 0;
+  NullBlock.merkleroothash[0] = 0;
+  printf("Generating initial block at UNIX time:\n");
+  NullBlock.time = system("date '+%s'");
+  NullBlock.nBits = 0;
+  NullBlock.nonce = 0;
+  NullBlock.magic_number = 0;
+  NullBlock.blocksize = 0;
+  NullBlock.transactionCounter = intTransactionCounter;
+  // End Genesis Block
+  
   printf("Creating users...\n");
   int intInitialCoin = 0;
   struct users user[6]; 
@@ -70,13 +89,18 @@ int main(){
   printf("Enter initial Satoshi count: ");
   scanf("%d", &intInitialCoin);
   printf("Distributing %d coins to User 0\n", intInitialCoin);
-  user[0].satoshis = intInitialCoin;
-
+  user[0].satoshis = intInitialCoin; // make into genesis block
   
-  
-  // CreateGenesis();
+  structTransaction[0].input = intInitialCoin;
+  structTransaction[0].output = 0;
+  structTransaction[0].output2 = intInitialCoin;
+  printf("Initial transaction completed at UNIX time:\n");
+  structTransaction[0].time = system("date '+%s'");
+  LastBlock = AddBlock(NullBlock, structTransaction[0]); // This is creating the Genesis block
+	   
   do{
     intTransactionCounter++;
+    printf("Transaction %d\n", intTransactionCounter);
     printf("Which user wants to send coins?\n");
     scanf("%d", &intSender);
     printf("Which user is receiving coins?\n");
@@ -84,13 +108,16 @@ int main(){
     printf("How many coins are we sending (in Satoshis)?");
     scanf("%d", &intAmount);
 
+
+    structTransaction[intTransactionCounter].input = 0;
     structTransaction[intTransactionCounter].input = user[intSender].satoshis;
 
     user[intSender].satoshis = user[intSender].satoshis - intAmount;
     user[intReceiver].satoshis = user[intReceiver].satoshis + intAmount;
 
-    structTransaction[intTransactionCounter].output = user[intReceiver].satoshis;
-    structTransaction[intTransactionCounter].input = user[intSender].satoshis;
+    structTransaction[intTransactionCounter].output = intAmount;
+    structTransaction[intTransactionCounter].output2 = user[intSender].satoshis;
+    printf("Moving next transaction at UNIX time:\n");
     structTransaction[intTransactionCounter].time = system("date '+%s'");
 
     printf("\nSender:\n");
@@ -99,11 +126,19 @@ int main(){
     display(user[intReceiver]);
     printf("\n");
 
+
+    NewBlock = AddBlock(LastBlock, structTransaction[intTransactionCounter]);
+    // Sign a file
+    // system("openssl dgst -sign user1private.pem test.pdf > signature.bin")
+
+    // Verify a file
+    // system("openssl dgst -verify user1public.pem -signature signature.bin test.pdf")
+
     
     printf("Do you want to make another transaction? (y/n)\n");
     scanf(" %c",&charDecision);
 
-
+    LastBlock = NewBlock;
   } while (charDecision ==  'y' && intTransactionCounter < 100);
   
   return 0;
@@ -141,7 +176,6 @@ void display(struct users s){
   printf("Public Key:%s\n", s.public);
   printf("Private Key:%s\n", s.private);
   printf("Balance:%d\n\n", s.satoshis);
-  CreateGenesis();
 }
 
 // Function CreateTransaction
@@ -159,10 +193,28 @@ void CreateGenesis(){
   //void AddBlock(PreviousTransaction)
 }
 
-void AddBlock(struct block lastBlock){
+struct block AddBlock(struct block lastBlock, struct transaction structTransaction){
   // Adds a block to the Genesis block
-  FILE *fileChain = fopen("chain","w");
-  fprintf(fileChain, "Block");
+  struct block thisBlock = lastBlock;
+  
+  FILE *fileChain = fopen("chain","a");
+  fprintf(fileChain, "\nNew Block ***************************\n");
+  fprintf(fileChain, "Version %d\n", lastBlock.version);
+  fprintf(fileChain, "Last Block Hash: %s\n", lastBlock.previousblockhash);
+  fprintf(fileChain, "Merkle Root Hash: %s\n", lastBlock.merkleroothash);
+  fprintf(fileChain, "Block Time: %d\n", lastBlock.time);
+  fprintf(fileChain, "nBits: %d\n", lastBlock.nBits);
+  fprintf(fileChain, "Nonce: %d\n",lastBlock.nonce);
+  fprintf(fileChain, "Magic Number: %d\n", lastBlock.magic_number);
+  fprintf(fileChain, "Blocksize: %d\n", lastBlock.blocksize);
+  fprintf(fileChain, "Block Transaction Counter: %d\n", lastBlock.transactionCounter);
+  fprintf(fileChain, "Transaction Input: %d\n",structTransaction.input);
+  fprintf(fileChain, "Transaction Sending: %d\n", structTransaction.output);
+  fprintf(fileChain, "Transaction Remaining With Sender: %d\n",structTransaction.output2);
+  fprintf(fileChain, "Transaction Time: %d\n", structTransaction.time);
+  fprintf(fileChain, "*************************************\n");
+  
+  return thisBlock;
 }
 
 
